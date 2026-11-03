@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">WASALNA</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="home">Home</string>
+    <string name="profile">Profile</string>
+    <string name="driver_account">Driver Account</string>
+    <string name="admin_panel">Admin Panel</string>
+    <string name="logout">Logout</string>
+    <string name="pickup_location">Pickup Location</string>
+    <string name="destination">Destination</string>
+    <string name="vehicle_type">Vehicle Type</string>
+    <string name="passengers">Number of Passengers</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
+    <string name="confirm_order">Confirm Order</string>
+    <string name="price">Price</string>
+</resources>

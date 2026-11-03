@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "742142268689",
+    "firebase_url": "https://tawsilaapp-f37b1740-default-rtdb.firebaseio.com",
+    "project_id": "tawsilaapp-f37b1740",
+    "storage_bucket": "tawsilaapp-f37b1740.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:742142268689:android:73110e92f455d63da668b0",
+        "android_client_info": {
+          "package_name": "com.albasel.tawsilaapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "742142268689-i214fv7nmc3infsrtrosgifl7q1dt9k2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.albasel.tawsilaapp",
+            "certificate_hash": "3e650399114c619038b933d7c8aec097d6115a51"
+          }
+        },
+        {
+          "client_id": "742142268689-8rol4p9ft83us99sc07cbc90aqts55vp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSgNBRaMypJEe3NZHmbQ-W2z6dm60ZO3g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "742142268689-8rol4p9ft83us99sc07cbc90aqts55vp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

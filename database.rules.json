@@ -1,0 +1,125 @@
+{
+  "rules": {
+    "tawsilaappfinal": {
+      "app_update": {
+        ".read": true,
+        ".write": true
+      },
+      "settings": {
+        ".read": true,
+        ".write": true
+      },
+      "vehiclePrices": {
+        ".read": true,
+        ".write": true
+      },
+      "group_chats": {
+        "$tripId": {
+          ".read": true,
+          ".write": true
+        }
+      },
+      "contact_messages": {
+        ".read": true,
+        "$messageId": {
+          ".write": true,
+          ".validate": "newData.hasChildren(['id', 'name', 'phone', 'message', 'timestamp']) && newData.child('id').isString() && newData.child('phone').isString() && newData.child('timestamp').isNumber()"
+        }
+      },
+      "contact_replies": {
+        "$userId": {
+          ".read": true,
+          ".write": true
+        }
+      },
+      "notifications": {
+        "$userId": {
+          ".read": true,
+          ".write": true
+        }
+      },
+      "driver_active_orders": {
+        "$driverId": {
+          ".read": true,
+          ".write": true
+        }
+      },
+      "orders": {
+        ".read": true,
+        ".indexOn": ["userId", "driverId", "status", "timestamp", "rideType"],
+        "$orderId": {
+          ".write": true,
+          ".validate": "newData.hasChildren(['userId', 'pickupName', 'destinationName', 'price', 'status']) && newData.child('userId').isString() && newData.child('price').isNumber() && newData.child('price').val() >= 0 && newData.child('status').isString()"
+        }
+      },
+      "phones": {
+        ".read": true,
+        "$phone": {
+          ".write": true,
+          ".validate": "newData.isString()"
+        }
+      },
+      "usernames": {
+        ".read": true,
+        "$username": {
+          ".write": true,
+          ".validate": "newData.isString()"
+        }
+      },
+      "system_notifications": {
+        "$uid": {
+          ".read": true,
+          ".write": true,
+          ".indexOn": ["timestamp"],
+          "$nid": {
+            ".validate": "newData.hasChildren(['id', 'title', 'content', 'timestamp']) && newData.child('timestamp').isNumber()"
+          }
+        }
+      },
+      "trip_locations": {
+        "$orderId": {
+          ".read": true,
+          ".write": true
+        }
+      },
+      "users": {
+        ".read": true,
+        ".indexOn": ["phone", "username", "isOnline", "approved", "role"],
+        "$uid": {
+          ".write": true,
+          ".validate": "newData.hasChildren(['name', 'phone'])",
+          "name": {
+            ".validate": "newData.isString() && newData.val().length > 0"
+          },
+          "phone": {
+            ".validate": "newData.isString() && newData.val().length >= 8"
+          },
+          "role": {
+            ".validate": "newData.isString() && (newData.val() == 'USER' || newData.val() == 'DRIVER' || newData.val() == 'ADMIN')"
+          },
+          "isOnline": {
+            ".validate": "newData.isBoolean()"
+          },
+          "approved": {
+            ".validate": "newData.isBoolean()"
+          },
+          "points": {
+            ".validate": "newData.isNumber()"
+          },
+          "driverPoints": {
+            ".validate": "newData.isNumber()"
+          },
+          "walletBalance": {
+            ".validate": "newData.isNumber()"
+          },
+          "totalEarnings": {
+            ".validate": "newData.isNumber()"
+          },
+          "paidCommission": {
+            ".validate": "newData.isNumber()"
+          }
+        }
+      }
+    }
+  }
+}

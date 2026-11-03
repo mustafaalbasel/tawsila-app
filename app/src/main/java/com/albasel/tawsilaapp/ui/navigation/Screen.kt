@@ -1,0 +1,27 @@
+package com.albasel.tawsilaapp.ui.navigation
+
+sealed class Screen(val route: String) {
+    object Splash : Screen("splash")
+    object Onboarding : Screen("onboarding")
+    object Login : Screen("login")
+    object OTP : Screen("otp")
+    object Register : Screen("register")
+    object Home : Screen("home")
+    object RideSelection : Screen("ride_selection")
+    object Bidding : Screen("bidding")
+    object DriverOffers : Screen("driver_offers")
+    object Tracking : Screen("tracking")
+    object RideInProgress : Screen("ride_in_progress")
+    object Arrived : Screen("arrived")
+    object Payment : Screen("payment")
+    object Rating : Screen("rating")
+    object History : Screen("history")
+    object Profile : Screen("profile")
+    object Wallet : Screen("wallet")
+    object Notifications : Screen("notifications")
+    object Chat : Screen("chat")
+    object Settings : Screen("settings")
+    object Safety : Screen("safety")
+    object DriverHome : Screen("driver_home")
+    object AdminHome : Screen("admin_home")
+}

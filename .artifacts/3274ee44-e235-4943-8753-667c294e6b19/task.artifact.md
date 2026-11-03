@@ -1,0 +1,6 @@
+- [x] Update `FirebaseManager.kt` (`acceptOrder` and `cancelOrderWithCompensation`)
+- [x] Update `InsideCityScreen.kt` (Date/Time layout and Year logic)
+- [x] Update `HomeScreen.kt` (Smooth car marker animation)
+- [x] Update `RideHistoryScreen.kt` (Cancellation fee logic)
+- [x] Update `TrackRideScreen.kt` (Driver info display)
+- [x] Verify all changes

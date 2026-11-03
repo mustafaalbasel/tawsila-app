@@ -1,0 +1,223 @@
+{
+  "version": 8,
+  "name": "Basel Navigation Ultimate Dark",
+  "sources": {
+    "openmaptiles": {
+      "type": "vector",
+      "url": "https://tiles.openfreemap.org/planet"
+    }
+  },
+  "sprite": "https://tiles.openfreemap.org/sprites/osm-liberty",
+  "glyphs": "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": { "background-color": "#08131F" }
+    },
+    {
+      "id": "park",
+      "type": "fill",
+      "source": "openmaptiles",
+      "source-layer": "park",
+      "paint": { "fill-color": "#1F5138" }
+    },
+    {
+      "id": "water",
+      "type": "fill",
+      "source": "openmaptiles",
+      "source-layer": "water",
+      "paint": {
+        "fill-color": "#133F69",
+        "fill-outline-color": "#1E5D9B"
+      }
+    },
+    {
+      "id": "building",
+      "type": "fill",
+      "source": "openmaptiles",
+      "source-layer": "building",
+      "paint": {
+        "fill-color": "#111C29",
+        "fill-outline-color": "#18283B",
+        "fill-antialias": true
+      }
+    },
+    {
+      "id": "landuse_airport",
+      "type": "fill",
+      "source": "openmaptiles",
+      "source-layer": "landuse",
+      "filter": ["==", "class", "airport"],
+      "paint": { "fill-color": "#1E2736" }
+    },
+    {
+      "id": "land_border",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "landuse",
+      "paint": { "line-color": "#2A3547", "line-width": 1 }
+    },
+    {
+      "id": "road_residential",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": ["all", ["==", "$type", "LineString"], ["in", "class", "residential", "path", "service", "track", "unclassified"]],
+      "paint": {
+        "line-color": "#43546F",
+        "line-width": 2.5
+      }
+    },
+    {
+      "id": "road_secondary",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": ["all", ["==", "$type", "LineString"], ["in", "class", "secondary", "tertiary"]],
+      "paint": {
+        "line-color": "#596D89",
+        "line-width": 4
+      }
+    },
+    {
+      "id": "road_primary_casing",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": ["all", ["==", "$type", "LineString"], ["==", "class", "primary"]],
+      "paint": {
+        "line-color": "#6E5A26",
+        "line-width": 9
+      }
+    },
+    {
+      "id": "road_primary",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": ["all", ["==", "$type", "LineString"], ["==", "class", "primary"]],
+      "paint": {
+        "line-color": "#B99A47",
+        "line-width": 7
+      }
+    },
+    {
+      "id": "road_motorway_casing",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": ["all", ["==", "$type", "LineString"], ["in", "class", "motorway", "trunk"]],
+      "paint": {
+        "line-color": "#7F6A29",
+        "line-width": 11
+      }
+    },
+    {
+      "id": "road_motorway",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": ["all", ["==", "$type", "LineString"], ["in", "class", "motorway", "trunk"]],
+      "paint": {
+        "line-color": "#C8A950",
+        "line-width": 9,
+        "line-blur": 0.5
+      }
+    },
+    {
+      "id": "road_bridge",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": ["all", ["==", "brunnel", "bridge"]],
+      "paint": { "line-color": "#7B6540" }
+    },
+    {
+      "id": "railway",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": ["==", "class", "rail"],
+      "paint": { "line-color": "#555555", "line-width": 1 }
+    },
+    {
+      "id": "label_minor_street",
+      "type": "symbol",
+      "source": "openmaptiles",
+      "source-layer": "transportation_name",
+      "filter": ["==", "class", "residential"],
+      "layout": {
+        "text-field": "{name:ar}",
+        "text-font": ["Noto Sans Regular"],
+        "text-size": 11,
+        "symbol-placement": "line"
+      },
+      "paint": { "text-color": "#97A4B5" }
+    },
+    {
+      "id": "label_street",
+      "type": "symbol",
+      "source": "openmaptiles",
+      "source-layer": "transportation_name",
+      "filter": ["in", "class", "primary", "secondary"],
+      "layout": {
+        "text-field": "{name:ar}",
+        "text-font": ["Noto Sans Regular"],
+        "text-size": 13,
+        "symbol-placement": "line"
+      },
+      "paint": { "text-color": "#D7DDE6" }
+    },
+    {
+      "id": "label_district",
+      "type": "symbol",
+      "source": "openmaptiles",
+      "source-layer": "place",
+      "filter": ["==", "class", "suburb"],
+      "layout": {
+        "text-field": "{name:ar}",
+        "text-font": ["Noto Sans Regular"],
+        "text-size": 16
+      },
+      "paint": { "text-color": "#D7DDE6" }
+    },
+    {
+      "id": "label_city",
+      "type": "symbol",
+      "source": "openmaptiles",
+      "source-layer": "place",
+      "filter": ["==", "class", "city"],
+      "layout": {
+        "text-field": "{name:ar}",
+        "text-font": ["Noto Sans Arabic Bold", "Noto Sans Regular"],
+        "text-size": 20
+      },
+      "paint": {
+        "text-color": "#FFFFFF",
+        "text-halo-color": "rgba(0,0,0,0.45)",
+        "text-halo-width": 2,
+        "text-halo-blur": 1
+      }
+    },
+    {
+      "id": "poi_icon",
+      "type": "symbol",
+      "source": "openmaptiles",
+      "source-layer": "poi",
+      "layout": {
+        "icon-image": "{class}_11",
+        "text-field": "{name:ar}",
+        "text-font": ["Noto Sans Regular"],
+        "text-size": 11,
+        "text-offset": [0, 0.6],
+        "text-anchor": "top"
+      },
+      "paint": {
+        "text-color": "#FFFFFF",
+        "text-halo-color": "rgba(0,0,0,0.8)",
+        "text-halo-width": 1
+      }
+    }
+  ]
+}

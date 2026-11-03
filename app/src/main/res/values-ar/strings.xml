@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">WASALNA</string>
+    <string name="login">تسجيل الدخول</string>
+    <string name="register">تسجيل جديد</string>
+    <string name="home">الرئيسية</string>
+    <string name="profile">الصفحة الشخصية</string>
+    <string name="driver_account">حساب السائق</string>
+    <string name="admin_panel">لوحة التحكم</string>
+    <string name="logout">تسجيل الخروج</string>
+    <string name="pickup_location">موقع الانطلاق</string>
+    <string name="destination">الوجهة</string>
+    <string name="vehicle_type">نوع السيارة</string>
+    <string name="passengers">عدد الأفراد</string>
+    <string name="date">التاريخ</string>
+    <string name="time">الوقت</string>
+    <string name="confirm_order">تأكيد الطلب</string>
+    <string name="price">السعر</string>
+</resources>
