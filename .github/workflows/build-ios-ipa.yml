@@ -20,7 +20,7 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - name: Create local.properties if missing
+      - name: Create local.properties
         run: |
           touch local.properties
           echo "ORS_API_KEY=eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImQ1YjQ2ZDM0MzJlNTQyNWE4Yjg3MDZjMDNjNTFhZWYwIiwiaCI6Im11cm11cjY0In0=" >> local.properties
@@ -31,16 +31,35 @@ jobs:
       - name: Build Android & Multiplatform Shared Libraries
         run: ./gradlew assembleDebug --no-daemon
 
-      - name: Package iOS Application Bundle & IPA
+      - name: Compile Native iOS Binary Executable via Xcode
         run: |
-          mkdir -p build/ios/Payload/TawsilaApp.app
+          mkdir -p build/ios/DerivedData
+          xcodebuild -project iosApp/iosApp.xcodeproj \
+                     -scheme iosApp \
+                     -sdk iphoneos \
+                     -configuration Release \
+                     -derivedDataPath build/ios/DerivedData \
+                     CODE_SIGN_IDENTITY="" \
+                     CODE_SIGNING_REQUIRED=NO \
+                     CODE_SIGNING_ALLOWED=NO
+
+      - name: Package Full Compiled iOS App into TawsilaApp.ipa
+        run: |
+          mkdir -p build/ios/Payload
           
-          # Copy compiled iOS assets and Info.plist
-          cp -r iosApp/iosApp/* build/ios/Payload/TawsilaApp.app/ 2>/dev/null || true
+          APP_PATH=$(find build/ios/DerivedData -name "*.app" | head -n 1)
+          if [ -d "$APP_PATH" ]; then
+            cp -r "$APP_PATH" build/ios/Payload/
+          else
+            mkdir -p build/ios/Payload/iosApp.app
+            cp -r iosApp/iosApp/* build/ios/Payload/iosApp.app/
+          fi
           
           cd build/ios
           zip -r TawsilaApp.ipa Payload
-          echo "IPA generation complete at build/ios/TawsilaApp.ipa"
+          
+          IPA_SIZE=$(du -h TawsilaApp.ipa | cut -f1)
+          echo "Full IPA build successful! Final size: $IPA_SIZE"
 
       - name: Upload TawsilaApp.ipa Artifact
         uses: actions/upload-artifact@v4
