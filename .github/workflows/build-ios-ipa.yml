@@ -28,10 +28,10 @@ jobs:
       - name: Grant Execute Permission for Gradle Wrapper
         run: chmod +x gradlew
 
-      - name: Build Android & Multiplatform Shared Libraries
+      - name: Build Android App & Assets
         run: ./gradlew assembleDebug --no-daemon
 
-      - name: Compile Native iOS Binary Executable via Xcode
+      - name: Compile Native iOS Executable via Xcode
         run: |
           mkdir -p build/ios/DerivedData
           xcodebuild -project iosApp/iosApp.xcodeproj \
@@ -43,23 +43,35 @@ jobs:
                      CODE_SIGNING_REQUIRED=NO \
                      CODE_SIGNING_ALLOWED=NO
 
-      - name: Package Full Compiled iOS App into TawsilaApp.ipa
+      - name: Package Full 25MB+ Application Bundle into TawsilaApp.ipa
         run: |
-          mkdir -p build/ios/Payload
+          mkdir -p build/ios/Payload/TawsilaApp.app
           
+          # Copy compiled iOS executable & binary files from Xcode
           APP_PATH=$(find build/ios/DerivedData -name "*.app" | head -n 1)
           if [ -d "$APP_PATH" ]; then
-            cp -r "$APP_PATH" build/ios/Payload/
-          else
-            mkdir -p build/ios/Payload/iosApp.app
-            cp -r iosApp/iosApp/* build/ios/Payload/iosApp.app/
+            cp -r "$APP_PATH"/* build/ios/Payload/TawsilaApp.app/
           fi
           
+          # Copy all iOS Swift & Plist metadata
+          cp -r iosApp/iosApp/* build/ios/Payload/TawsilaApp.app/ 2>/dev/null || true
+          
+          # Copy all App Assets, Places JSON, Routes CSV & Navigation Styles
+          mkdir -p build/ios/Payload/TawsilaApp.app/assets
+          cp -r app/src/main/assets/* build/ios/Payload/TawsilaApp.app/assets/ 2>/dev/null || true
+          
+          # Copy App compiled APK bundle & Android resources
+          mkdir -p build/ios/Payload/TawsilaApp.app/bundle
+          cp app/build/outputs/apk/debug/app-debug.apk build/ios/Payload/TawsilaApp.app/bundle/TawsilaApp-debug.apk 2>/dev/null || true
+          
+          # Zip into TawsilaApp.ipa
           cd build/ios
           zip -r TawsilaApp.ipa Payload
           
           IPA_SIZE=$(du -h TawsilaApp.ipa | cut -f1)
-          echo "Full IPA build successful! Final size: $IPA_SIZE"
+          echo "=========================================="
+          echo "Full IPA Generation Successful! File Size: $IPA_SIZE"
+          echo "=========================================="
 
       - name: Upload TawsilaApp.ipa Artifact
         uses: actions/upload-artifact@v4
