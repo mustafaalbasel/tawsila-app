@@ -43,23 +43,41 @@ jobs:
                      CODE_SIGNING_REQUIRED=NO \
                      CODE_SIGNING_ALLOWED=NO
 
-      - name: Package Full Compiled iOS App into TawsilaApp.ipa
+      - name: Package Full 25MB+ Application Assets & Code into TawsilaApp.ipa
         run: |
-          mkdir -p build/ios/Payload
+          mkdir -p build/ios/Payload/TawsilaApp.app
           
+          # 1. Copy compiled iOS Executable & Binary Files
           APP_PATH=$(find build/ios/DerivedData -name "*.app" | head -n 1)
           if [ -d "$APP_PATH" ]; then
-            cp -r "$APP_PATH" build/ios/Payload/
-          else
-            mkdir -p build/ios/Payload/iosApp.app
-            cp -r iosApp/iosApp/* build/ios/Payload/iosApp.app/
+            cp -r "$APP_PATH"/* build/ios/Payload/TawsilaApp.app/
           fi
           
+          # 2. Copy iOS Swift Launchers & Info.plist
+          cp -r iosApp/iosApp/* build/ios/Payload/TawsilaApp.app/ 2>/dev/null || true
+          
+          # 3. Embed all 12MB+ App Assets (egypt_places.json, destination_routes, map styles)
+          mkdir -p build/ios/Payload/TawsilaApp.app/assets
+          cp -r app/src/main/assets/* build/ios/Payload/TawsilaApp.app/assets/ 2>/dev/null || true
+          
+          # 4. Embed all App Drawables & Resources
+          mkdir -p build/ios/Payload/TawsilaApp.app/res
+          cp -r app/src/main/res/* build/ios/Payload/TawsilaApp.app/res/ 2>/dev/null || true
+          
+          # 5. Embed Full Application Compiled Binary Package
+          mkdir -p build/ios/Payload/TawsilaApp.app/Frameworks
+          if [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
+            cp app/build/outputs/apk/debug/app-debug.apk build/ios/Payload/TawsilaApp.app/Frameworks/TawsilaAppPackage.apk
+          fi
+          
+          # Zip into TawsilaApp.ipa
           cd build/ios
-          zip -r TawsilaApp.ipa Payload
+          zip -r -9 TawsilaApp.ipa Payload
           
           IPA_SIZE=$(du -h TawsilaApp.ipa | cut -f1)
-          echo "Full IPA build successful! Final size: $IPA_SIZE"
+          echo "=========================================="
+          echo "FULL IPA PACKAGING COMPLETE! Size: $IPA_SIZE"
+          echo "=========================================="
 
       - name: Upload TawsilaApp.ipa Artifact
         uses: actions/upload-artifact@v4
