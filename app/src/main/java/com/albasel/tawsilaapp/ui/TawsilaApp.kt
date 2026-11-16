@@ -18,6 +18,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -25,6 +26,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.draw.clip
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
@@ -651,10 +653,43 @@ fun WasalnaApp(firebaseManager: FirebaseManager, initialRoute: String? = null, o
                         drawerShape = RoundedCornerShape(topEnd = 0.dp, bottomEnd = 0.dp)
                     ) {
                         Column(modifier = Modifier.fillMaxSize()) {
-                            Box(modifier = Modifier.fillMaxWidth().height(220.dp)) {
+                            Box(modifier = Modifier.fillMaxWidth().height(260.dp)) {
                                 Image(painter = painterResource(id = R.drawable.header_bg), contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-                                Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(0.7f)))))
-                                Text("WASALNA", modifier = Modifier.align(Alignment.BottomStart).padding(20.dp), color = Color(0xFFC5A059), fontSize = 28.sp, fontWeight = FontWeight.Black)
+                                Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(0.85f)))))
+                                
+                                Row(
+                                    modifier = Modifier
+                                        .align(Alignment.BottomStart)
+                                        .padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    val userImg = currentUser?.profileImageDriveId ?: currentUser?.profileImageBase64
+                                    if (!userImg.isNullOrEmpty()) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(72.dp)
+                                                .clip(CircleShape)
+                                                .border(2.dp, Color(0xFFC5A059), CircleShape)
+                                        ) {
+                                            com.albasel.tawsilaapp.util.AppImageView(userImg, Modifier.fillMaxSize())
+                                        }
+                                        Spacer(Modifier.width(12.dp))
+                                    }
+                                    Column {
+                                        Text(
+                                            text = currentUser?.name?.takeIf { it.isNotBlank() } ?: "WASALNA",
+                                            color = Color.White,
+                                            fontSize = 20.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Text(
+                                            text = "WASALNA",
+                                            color = Color(0xFFC5A059),
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                    }
+                                }
                             }
                             Column(modifier = Modifier.padding(12.dp).weight(1f).verticalScroll(rememberScrollState())) {
                                 DrawerItem(if(language=="AR") "الرئيسية" else "Home", Icons.Default.Home, Color(0xFF2196F3)) { 

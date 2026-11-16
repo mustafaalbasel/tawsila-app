@@ -205,6 +205,9 @@ fun HomeScreen(
 
     var activeRouteData by remember { mutableStateOf<RouteOption?>(null) }
     var lastRoutingParams by remember { mutableStateOf<String?>(null) }
+    var lastCalcPickupLatLng by remember { mutableStateOf<LatLng?>(null) }
+    var lastCalcDestLatLng by remember { mutableStateOf<LatLng?>(null) }
+    var lastCalcRouteIndex by remember { mutableIntStateOf(-1) }
     var lastAnimatedRouteParams by remember { mutableStateOf<String?>(null) }
     var routingRequestId by remember { mutableLongStateOf(0L) }
     var isRouteLoading by remember { mutableStateOf(false) }
@@ -1250,7 +1253,12 @@ fun HomeScreen(
         // RULE 4, 5, 6: BOTH Pickup AND Destination have valid text & coordinates!
         val currentParams = "${pickupLatLng?.latitude},${pickupLatLng?.longitude}_${destinationLatLng?.latitude},${destinationLatLng?.longitude}_${selectedRouteIndex}"
 
-        if (lastRoutingParams == currentParams && routePolylines.isNotEmpty()) {
+        val lastP = lastCalcPickupLatLng
+        val lastD = lastCalcDestLatLng
+        val isNearbyPickup = if (lastP != null && pickupLatLng != null) MapUtils.calculateDistance(pickupLatLng!!.latitude, pickupLatLng!!.longitude, lastP.latitude, lastP.longitude) < 0.15 else false
+        val isNearbyDest = if (lastD != null && destinationLatLng != null) MapUtils.calculateDistance(destinationLatLng!!.latitude, destinationLatLng!!.longitude, lastD.latitude, lastD.longitude) < 0.15 else false
+
+        if ((lastRoutingParams == currentParams || (isNearbyPickup && isNearbyDest && selectedRouteIndex == lastCalcRouteIndex)) && routePolylines.isNotEmpty() && activeRouteData != null) {
             return@LaunchedEffect
         }
 
@@ -1334,6 +1342,9 @@ fun HomeScreen(
                     
                     activeRouteData = chosen
                     lastRoutingParams = currentParams
+                    lastCalcPickupLatLng = pickupLatLng
+                    lastCalcDestLatLng = destinationLatLng
+                    lastCalcRouteIndex = finalIndex
                     calculatedDistance = chosen.distance
 
                     Log.d("WASALNA_TRACE", "ROUTING_RESPONSE: distance=${chosen.distance} km, duration=${chosen.duration / 60.0} min, points=${chosen.points.size}")

@@ -491,7 +491,7 @@ object MapMarkerUtils {
             val matrix = Matrix()
             matrix.postScale(carW.toFloat() / baseBmp.width, carH.toFloat() / baseBmp.height)
             matrix.postTranslate((canvasSize - carW) / 2f, (canvasSize - carH) / 2f)
-            matrix.postRotate((roundedBearing + 90f) % 360f, centerX, centerY)
+            matrix.postRotate(roundedBearing.toFloat(), centerX, centerY)
 
             canvas.drawBitmap(baseBmp, matrix, Paint(Paint.ANTI_ALIAS_FLAG))
             IconFactory.getInstance(context).fromBitmap(rotatedBitmap)
