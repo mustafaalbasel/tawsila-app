@@ -836,10 +836,8 @@ fun HomeScreen(
     }
 
     LaunchedEffect(animatedCarBearing) {
-        var diff = (animatedCarBearing - markerBearing.value) % 360
-        if (diff > 180) diff -= 360
-        if (diff < -180) diff += 360
-        markerBearing.animateTo(markerBearing.value + diff, tween(800, easing = LinearEasing))
+        val diff = (animatedCarBearing - markerBearing.value + 540f) % 360f - 180f
+        markerBearing.animateTo(markerBearing.value + diff, tween(500, easing = LinearEasing))
     }
 
     LaunchedEffect(markerLat.value, markerLng.value, markerBearing.value, isDarkMode, mapLibreInstance, mapStyleLoaded) {

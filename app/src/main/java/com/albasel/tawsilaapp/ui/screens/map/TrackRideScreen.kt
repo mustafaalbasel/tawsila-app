@@ -316,11 +316,9 @@ fun TrackRideScreen(
     }
 
     LaunchedEffect(driverBearing, deviceAzimuthDegrees) {
-        val targetAngle = if (isDriver) deviceAzimuthDegrees else driverBearing
-        var diff = (targetAngle - smoothDriverBearing.value) % 360
-        if (diff > 180) diff -= 360
-        if (diff < -180) diff += 360
-        smoothDriverBearing.animateTo(smoothDriverBearing.value + diff, tween(300, easing = LinearEasing))
+        val targetAngle = if (isDriver) (if (deviceAzimuthDegrees != 0f) deviceAzimuthDegrees else driverBearing) else driverBearing
+        val diff = (targetAngle - smoothDriverBearing.value + 540f) % 360f - 180f
+        smoothDriverBearing.animateTo(smoothDriverBearing.value + diff, tween(400, easing = LinearEasing))
     }
 
     LaunchedEffect(currentUserId) {
