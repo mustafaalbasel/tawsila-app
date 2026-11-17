@@ -815,22 +815,12 @@ fun HomeScreen(
                         val azimuth = (rawAzimuth + 360f) % 360f
                         val diff = (azimuth - deviceAzimuthDegrees + 540f) % 360f - 180f
                         
-                        // Deadband Noise Filter: Ignore micro-fluctuations < 2.2° when phone is held still
-                        if (kotlin.math.abs(diff) > 2.2f) {
-                            // 1.5x Slower Damped Turning Motion (Synchronized with phone turning)
-                            val dampedStep = (diff / 1.5f) * 0.20f
+                        // Deadband Noise Filter: Ignore micro-fluctuations < 2.0° when phone is held still (Prevents shaking)
+                        if (kotlin.math.abs(diff) > 2.0f) {
+                            // 1.5x Slower Damped Turning Motion (Synchronized smoothly with phone turning)
+                            val dampedStep = (diff / 1.5f) * 0.15f
                             deviceAzimuthDegrees = (deviceAzimuthDegrees + dampedStep + 360f) % 360f
                             animatedCarBearing = deviceAzimuthDegrees
-
-                            // Instant smooth MapLibre marker update
-                            mapLibreInstance?.let { map ->
-                                animatedCarMarker?.let { marker ->
-                                    if (map.markers.contains(marker)) {
-                                        val icon = MapMarkerUtils.createNavigationArrowIcon(context, deviceAzimuthDegrees, isDarkMode)
-                                        marker.icon = icon
-                                    }
-                                }
-                            }
                         }
                     }
                 }
