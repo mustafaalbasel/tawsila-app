@@ -210,6 +210,7 @@ fun TrackRideScreen(
     DisposableEffect(Unit) {
         val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
         val rotationSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
+            ?: sensorManager?.getDefaultSensor(Sensor.TYPE_ORIENTATION)
         
         var sensorListener: SensorEventListener? = null
         if (sensorManager != null && rotationSensor != null) {
@@ -218,20 +219,25 @@ fun TrackRideScreen(
             
             sensorListener = object : SensorEventListener {
                 override fun onSensorChanged(event: SensorEvent?) {
-                    if (event != null && event.sensor.type == Sensor.TYPE_ROTATION_VECTOR) {
-                        SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
-                        SensorManager.getOrientation(rotationMatrix, orientationValues)
-                        val rawAzimuth = Math.toDegrees(orientationValues[0].toDouble()).toFloat()
+                    if (event != null) {
+                        val rawAzimuth = if (event.sensor.type == Sensor.TYPE_ROTATION_VECTOR) {
+                            SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
+                            SensorManager.getOrientation(rotationMatrix, orientationValues)
+                            Math.toDegrees(orientationValues[0].toDouble()).toFloat()
+                        } else if (event.sensor.type == Sensor.TYPE_ORIENTATION) {
+                            event.values[0]
+                        } else 0f
+
                         val azimuth = (rawAzimuth + 360f) % 360f
-                        
-                        // Low-pass filter smoothing for sensor jitter
                         val diff = (azimuth - deviceAzimuthDegrees + 540f) % 360f - 180f
-                        deviceAzimuthDegrees = (deviceAzimuthDegrees + diff * 0.12f + 360f) % 360f
+                        deviceAzimuthDegrees = (deviceAzimuthDegrees + diff * 0.35f + 360f) % 360f
+
+                        driverBearing = deviceAzimuthDegrees
                     }
                 }
                 override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
             }
-            sensorManager.registerListener(sensorListener, rotationSensor, SensorManager.SENSOR_DELAY_GAME)
+            sensorManager.registerListener(sensorListener, rotationSensor, SensorManager.SENSOR_DELAY_UI)
         }
         
         onDispose {

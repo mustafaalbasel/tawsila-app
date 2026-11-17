@@ -786,12 +786,13 @@ fun HomeScreen(
     var showNotificationsOverlay by remember { mutableStateOf(false) }
     val notificationsList = remember { mutableStateListOf<InAppNotification>() }
 
-    // Rotation sensor for real-time smooth compass turning of car icon
+    // Rotation sensor & Compass for real-time instant turning of car icon with phone movement
     var deviceAzimuthDegrees by remember { mutableFloatStateOf(0f) }
 
     DisposableEffect(Unit) {
         val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as? android.hardware.SensorManager
         val rotationSensor = sensorManager?.getDefaultSensor(android.hardware.Sensor.TYPE_ROTATION_VECTOR)
+            ?: sensorManager?.getDefaultSensor(android.hardware.Sensor.TYPE_ORIENTATION)
         
         var sensorListener: android.hardware.SensorEventListener? = null
         if (sensorManager != null && rotationSensor != null) {
@@ -800,20 +801,35 @@ fun HomeScreen(
             
             sensorListener = object : android.hardware.SensorEventListener {
                 override fun onSensorChanged(event: android.hardware.SensorEvent?) {
-                    if (event != null && event.sensor.type == android.hardware.Sensor.TYPE_ROTATION_VECTOR) {
-                        android.hardware.SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
-                        android.hardware.SensorManager.getOrientation(rotationMatrix, orientationValues)
-                        val rawAzimuth = Math.toDegrees(orientationValues[0].toDouble()).toFloat()
+                    if (event != null) {
+                        val rawAzimuth = if (event.sensor.type == android.hardware.Sensor.TYPE_ROTATION_VECTOR) {
+                            android.hardware.SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
+                            android.hardware.SensorManager.getOrientation(rotationMatrix, orientationValues)
+                            Math.toDegrees(orientationValues[0].toDouble()).toFloat()
+                        } else if (event.sensor.type == android.hardware.Sensor.TYPE_ORIENTATION) {
+                            event.values[0]
+                        } else 0f
+
                         val azimuth = (rawAzimuth + 360f) % 360f
-                        
                         val diff = (azimuth - deviceAzimuthDegrees + 540f) % 360f - 180f
-                        deviceAzimuthDegrees = (deviceAzimuthDegrees + diff * 0.12f + 360f) % 360f
+                        
+                        deviceAzimuthDegrees = (deviceAzimuthDegrees + diff * 0.35f + 360f) % 360f
                         animatedCarBearing = deviceAzimuthDegrees
+
+                        // Instant zero-delay MapLibre marker icon update (0ms latency lockstep turning with phone)
+                        mapLibreInstance?.let { map ->
+                            animatedCarMarker?.let { marker ->
+                                if (map.markers.contains(marker)) {
+                                    val icon = MapMarkerUtils.createNavigationArrowIcon(context, deviceAzimuthDegrees, isDarkMode)
+                                    marker.icon = icon
+                                }
+                            }
+                        }
                     }
                 }
                 override fun onAccuracyChanged(sensor: android.hardware.Sensor?, accuracy: Int) {}
             }
-            sensorManager.registerListener(sensorListener, rotationSensor, android.hardware.SensorManager.SENSOR_DELAY_GAME)
+            sensorManager.registerListener(sensorListener, rotationSensor, android.hardware.SensorManager.SENSOR_DELAY_UI)
         }
         
         onDispose {
