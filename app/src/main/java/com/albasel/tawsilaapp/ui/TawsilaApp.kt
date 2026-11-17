@@ -649,11 +649,12 @@ fun WasalnaApp(firebaseManager: FirebaseManager, initialRoute: String? = null, o
                 if (showScaffold) {
                     ModalDrawerSheet(
                         modifier = Modifier.width(300.dp).fillMaxHeight(),
-                        drawerContainerColor = MaterialTheme.colorScheme.background,
-                        drawerShape = RoundedCornerShape(topEnd = 0.dp, bottomEnd = 0.dp)
+                        drawerContainerColor = if (isDarkTheme) Color(0xFF2C3238) else MaterialTheme.colorScheme.background,
+                        drawerShape = RoundedCornerShape(topEnd = 0.dp, bottomEnd = 0.dp),
+                        windowInsets = WindowInsets(0, 0, 0, 0)
                     ) {
                         Column(modifier = Modifier.fillMaxSize()) {
-                            Box(modifier = Modifier.fillMaxWidth().height(260.dp)) {
+                            Box(modifier = Modifier.fillMaxWidth().height(300.dp)) {
                                 Image(painter = painterResource(id = R.drawable.header_bg), contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
                                 Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(0.85f)))))
                                 
