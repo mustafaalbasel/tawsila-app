@@ -217,12 +217,14 @@ fun TrackRideScreen(
             val rotationMatrix = FloatArray(9)
             val orientationValues = FloatArray(3)
             
+            val remappedMatrix = FloatArray(9)
             sensorListener = object : SensorEventListener {
                 override fun onSensorChanged(event: SensorEvent?) {
                     if (event != null) {
                         val rawAzimuth = if (event.sensor.type == Sensor.TYPE_ROTATION_VECTOR) {
                             SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
-                            SensorManager.getOrientation(rotationMatrix, orientationValues)
+                            SensorManager.remapCoordinateSystem(rotationMatrix, SensorManager.AXIS_X, SensorManager.AXIS_Z, remappedMatrix)
+                            SensorManager.getOrientation(remappedMatrix, orientationValues)
                             Math.toDegrees(orientationValues[0].toDouble()).toFloat()
                         } else if (event.sensor.type == Sensor.TYPE_ORIENTATION) {
                             event.values[0]
@@ -230,9 +232,11 @@ fun TrackRideScreen(
 
                         val azimuth = (rawAzimuth + 360f) % 360f
                         val diff = (azimuth - deviceAzimuthDegrees + 540f) % 360f - 180f
-                        deviceAzimuthDegrees = (deviceAzimuthDegrees + diff * 0.35f + 360f) % 360f
-
-                        driverBearing = deviceAzimuthDegrees
+                        
+                        if (kotlin.math.abs(diff) > 2.2f) {
+                            deviceAzimuthDegrees = (deviceAzimuthDegrees + diff * 0.15f + 360f) % 360f
+                            driverBearing = deviceAzimuthDegrees
+                        }
                     }
                 }
                 override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}

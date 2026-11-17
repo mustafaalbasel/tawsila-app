@@ -799,12 +799,14 @@ fun HomeScreen(
             val rotationMatrix = FloatArray(9)
             val orientationValues = FloatArray(3)
             
+            val remappedMatrix = FloatArray(9)
             sensorListener = object : android.hardware.SensorEventListener {
                 override fun onSensorChanged(event: android.hardware.SensorEvent?) {
                     if (event != null) {
                         val rawAzimuth = if (event.sensor.type == android.hardware.Sensor.TYPE_ROTATION_VECTOR) {
                             android.hardware.SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
-                            android.hardware.SensorManager.getOrientation(rotationMatrix, orientationValues)
+                            android.hardware.SensorManager.remapCoordinateSystem(rotationMatrix, android.hardware.SensorManager.AXIS_X, android.hardware.SensorManager.AXIS_Z, remappedMatrix)
+                            android.hardware.SensorManager.getOrientation(remappedMatrix, orientationValues)
                             Math.toDegrees(orientationValues[0].toDouble()).toFloat()
                         } else if (event.sensor.type == android.hardware.Sensor.TYPE_ORIENTATION) {
                             event.values[0]
@@ -813,15 +815,18 @@ fun HomeScreen(
                         val azimuth = (rawAzimuth + 360f) % 360f
                         val diff = (azimuth - deviceAzimuthDegrees + 540f) % 360f - 180f
                         
-                        deviceAzimuthDegrees = (deviceAzimuthDegrees + diff * 0.35f + 360f) % 360f
-                        animatedCarBearing = deviceAzimuthDegrees
+                        // Deadband Noise Filter: Ignore micro-fluctuations < 2.2° when phone is held still
+                        if (kotlin.math.abs(diff) > 2.2f) {
+                            deviceAzimuthDegrees = (deviceAzimuthDegrees + diff * 0.15f + 360f) % 360f
+                            animatedCarBearing = deviceAzimuthDegrees
 
-                        // Instant zero-delay MapLibre marker icon update (0ms latency lockstep turning with phone)
-                        mapLibreInstance?.let { map ->
-                            animatedCarMarker?.let { marker ->
-                                if (map.markers.contains(marker)) {
-                                    val icon = MapMarkerUtils.createNavigationArrowIcon(context, deviceAzimuthDegrees, isDarkMode)
-                                    marker.icon = icon
+                            // Instant smooth MapLibre marker update
+                            mapLibreInstance?.let { map ->
+                                animatedCarMarker?.let { marker ->
+                                    if (map.markers.contains(marker)) {
+                                        val icon = MapMarkerUtils.createNavigationArrowIcon(context, deviceAzimuthDegrees, isDarkMode)
+                                        marker.icon = icon
+                                    }
                                 }
                             }
                         }
