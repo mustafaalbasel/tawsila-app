@@ -487,11 +487,11 @@ object MapMarkerUtils {
             val centerX = canvasSize / 2f
             val centerY = canvasSize / 2f
 
-            // Draw rotated 1.5x car bitmap centered inside the transparent canvas (Bumper/Hood faces front along road bearing)
+            // Draw rotated 1.5x car bitmap centered inside the transparent canvas (Bumper/Hood faces front along North road bearing)
             val matrix = Matrix()
             matrix.postScale(carW.toFloat() / baseBmp.width, carH.toFloat() / baseBmp.height)
             matrix.postTranslate((canvasSize - carW) / 2f, (canvasSize - carH) / 2f)
-            matrix.postRotate(roundedBearing.toFloat(), centerX, centerY)
+            matrix.postRotate((roundedBearing + 180f) % 360f, centerX, centerY)
 
             canvas.drawBitmap(baseBmp, matrix, Paint(Paint.ANTI_ALIAS_FLAG))
             IconFactory.getInstance(context).fromBitmap(rotatedBitmap)

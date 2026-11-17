@@ -817,7 +817,9 @@ fun HomeScreen(
                         
                         // Deadband Noise Filter: Ignore micro-fluctuations < 2.2° when phone is held still
                         if (kotlin.math.abs(diff) > 2.2f) {
-                            deviceAzimuthDegrees = (deviceAzimuthDegrees + diff * 0.15f + 360f) % 360f
+                            // 1.5x Slower Damped Turning Motion (Synchronized with phone turning)
+                            val dampedStep = (diff / 1.5f) * 0.20f
+                            deviceAzimuthDegrees = (deviceAzimuthDegrees + dampedStep + 360f) % 360f
                             animatedCarBearing = deviceAzimuthDegrees
 
                             // Instant smooth MapLibre marker update
@@ -858,7 +860,10 @@ fun HomeScreen(
 
     LaunchedEffect(animatedCarBearing) {
         val diff = (animatedCarBearing - markerBearing.value + 540f) % 360f - 180f
-        markerBearing.animateTo(markerBearing.value + diff, tween(500, easing = LinearEasing))
+        if (kotlin.math.abs(diff) > 1.2f) {
+            val dampedDiff = diff / 1.5f
+            markerBearing.animateTo(markerBearing.value + dampedDiff, tween(450, easing = LinearEasing))
+        }
     }
 
     LaunchedEffect(markerLat.value, markerLng.value, markerBearing.value, isDarkMode, mapLibreInstance, mapStyleLoaded) {

@@ -234,7 +234,8 @@ fun TrackRideScreen(
                         val diff = (azimuth - deviceAzimuthDegrees + 540f) % 360f - 180f
                         
                         if (kotlin.math.abs(diff) > 2.2f) {
-                            deviceAzimuthDegrees = (deviceAzimuthDegrees + diff * 0.15f + 360f) % 360f
+                            val dampedStep = (diff / 1.5f) * 0.20f
+                            deviceAzimuthDegrees = (deviceAzimuthDegrees + dampedStep + 360f) % 360f
                             driverBearing = deviceAzimuthDegrees
                         }
                     }
@@ -328,7 +329,10 @@ fun TrackRideScreen(
     LaunchedEffect(driverBearing, deviceAzimuthDegrees) {
         val targetAngle = if (isDriver) (if (deviceAzimuthDegrees != 0f) deviceAzimuthDegrees else driverBearing) else driverBearing
         val diff = (targetAngle - smoothDriverBearing.value + 540f) % 360f - 180f
-        smoothDriverBearing.animateTo(smoothDriverBearing.value + diff, tween(400, easing = LinearEasing))
+        if (kotlin.math.abs(diff) > 1.2f) {
+            val dampedDiff = diff / 1.5f
+            smoothDriverBearing.animateTo(smoothDriverBearing.value + dampedDiff, tween(450, easing = LinearEasing))
+        }
     }
 
     LaunchedEffect(currentUserId) {
