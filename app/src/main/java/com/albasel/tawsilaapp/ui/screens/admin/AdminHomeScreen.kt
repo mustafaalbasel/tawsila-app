@@ -201,13 +201,13 @@ fun AdminHomeScreen(firebaseManager: FirebaseManager, user: User?, initialTab: I
 
             Box(Modifier.weight(1f)) {
                 when (selectedRealTab) {
-                    0 -> UsersTab(firebaseManager, subTabState, targetIdState)
+                    0 -> UsersTab(firebaseManager, subTabState, targetIdState, user)
                     1 -> OrdersHistoryTab(firebaseManager, user)
                     2 -> FinanceTab(firebaseManager)
                     3 -> MessagesTab(firebaseManager)
                     4 -> SystemManagementTab(firebaseManager, user)
                     5 -> FormulaTab(firebaseManager)
-                    else -> UsersTab(firebaseManager, subTabState, targetIdState)
+                    else -> UsersTab(firebaseManager, subTabState, targetIdState, user)
                 }
             }
         }
@@ -1502,7 +1502,7 @@ fun FinanceTab(firebaseManager: FirebaseManager) {
 }
 
 @Composable
-fun UsersTab(firebaseManager: FirebaseManager, initialSubTab: Int = 0, targetId: String? = null) {
+fun UsersTab(firebaseManager: FirebaseManager, initialSubTab: Int = 0, targetId: String? = null, currentUser: User? = null) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var users by remember { mutableStateOf(emptyList<User>()) }
@@ -2295,18 +2295,21 @@ fun UsersTab(firebaseManager: FirebaseManager, initialSubTab: Int = 0, targetId:
                             }
                         }
 
-                        Button(
-                            onClick = { showDeleteConfirm = true }, 
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red.copy(0.1f), contentColor = Color.Red), 
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                                .height(54.dp),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Icon(Icons.Default.Delete, null)
-                            Spacer(Modifier.width(8.dp))
-                            Text(if(isDriverView) "حذف حساب السائق نهائياً" else "حذف حساب العميل نهائياً", fontWeight = FontWeight.Bold)
+                        val isAppOwner = (currentUser?.phone?.contains("01098804131") == true || currentUser?.id?.contains("01098804131") == true || firebaseManager.formatPhoneKey(currentUser?.phone ?: "").contains("01098804131"))
+                        if (isAppOwner) {
+                            Button(
+                                onClick = { showDeleteConfirm = true }, 
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.Red.copy(0.1f), contentColor = Color.Red), 
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp)
+                                    .height(54.dp),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Icon(Icons.Default.Delete, null)
+                                Spacer(Modifier.width(8.dp))
+                                Text(if(isDriverView) "حذف حساب السائق نهائياً" else "حذف حساب العميل نهائياً", fontWeight = FontWeight.Bold)
+                            }
                         }
 
                         // Black Readonly Tab at the end of the scrollable content (1cm height)

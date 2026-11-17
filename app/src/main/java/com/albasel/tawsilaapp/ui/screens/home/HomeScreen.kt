@@ -1186,13 +1186,13 @@ fun HomeScreen(
                 result.lastLocation?.let { loc ->
                     val ll = LatLng(loc.latitude, loc.longitude)
                     
-                    // Calculate bearing from movement if sensor doesn't provide it
-                    if (loc.hasBearing()) {
+                    // Calculate bearing from movement when driving (>0.5m/s or >3m movement)
+                    if (loc.hasSpeed() && loc.speed > 0.5f && loc.hasBearing()) {
                         animatedCarBearing = loc.bearing
                     } else if (currentLocation != null) {
                         val prev = currentLocation!!
                         val dist = MapUtils.calculateDistance(prev.latitude, prev.longitude, ll.latitude, ll.longitude)
-                        if (dist > 0.002) { // Only update bearing if moved > 2m to avoid jitter
+                        if (dist > 0.003) { // Only update movement bearing if moved > 3m
                             animatedCarBearing = MapUtils.calculateBearing(prev.latitude, prev.longitude, ll.latitude, ll.longitude).toFloat()
                         }
                     }
